@@ -9,18 +9,18 @@ test.beforeEach(async ({ page }) => {
 
 async function createFromList(page: Page) {
   await page.goto('/admin/templates');
-  await page.getByRole('button', { name: /new instrument/i }).click();
+  await page.getByRole('button', { name: /new template/i }).click();
   await expect(page).toHaveURL(/\/admin\/templates\/[0-9a-f-]+\/edit/);
 }
 
-test.describe('template authoring — new instrument + metadata', () => {
-  test('creating a new instrument lands on the editor with a default name', async ({ page }) => {
+test.describe('template authoring — new template + metadata', () => {
+  test('creating a new template lands on the editor with a default name', async ({ page }) => {
     await createFromList(page);
-    await expect(page.getByRole('heading', { level: 1, name: 'Untitled instrument' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Untitled template' })).toBeVisible();
     await expect(page.getByRole('button', { name: /save & publish/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /add section/i })).toBeVisible();
     // The Metadata paper has a name input pre-filled.
-    await expect(page.locator('.editor-field-row').first().locator('input')).toHaveValue('Untitled instrument');
+    await expect(page.locator('.editor-field-row').first().locator('input')).toHaveValue('Untitled template');
   });
 
   test('rename and describe, save, and the detail view reflects the changes', async ({ page }) => {

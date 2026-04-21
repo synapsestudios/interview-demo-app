@@ -29,12 +29,14 @@ test.describe('admin: templates list + status', () => {
 });
 
 test.describe('admin: template detail rendering', () => {
-  test('sections render with roman numerals', async ({ page }) => {
+  test('each seeded section renders', async ({ page }) => {
     const tpl = await fx.getFirstPublishedV1();
     await page.goto(`/admin/templates/${tpl.id}`);
-    // Our seeded v1 has 4 sections; numerals should include I, II, III, IV.
-    await expect(page.locator('.numeral', { hasText: /§\s*I\b/ })).toBeVisible();
-    await expect(page.locator('.numeral', { hasText: /§\s*IV\b/ })).toBeVisible();
+    // Our seeded v1 has 4 sections; they should all be visible as headings.
+    const sectionTitles = tpl.sections.map((s) => s.title);
+    for (const title of sectionTitles) {
+      await expect(page.getByRole('heading', { level: 2, name: title })).toBeVisible();
+    }
   });
 
   test('scoring bands are shown with swatches', async ({ page }) => {
@@ -50,7 +52,7 @@ test.describe('admin: template detail rendering', () => {
   test('published template shows locked banner', async ({ page }) => {
     const tpl = await fx.getFirstPublishedV1();
     await page.goto(`/admin/templates/${tpl.id}`);
-    await expect(page.getByText(/Instrument locked/i)).toBeVisible();
+    await expect(page.getByText(/Template locked/i)).toBeVisible();
   });
 
   test('true_false, multiple_choice, and likert each render correctly', async ({ page }) => {

@@ -20,7 +20,7 @@ test.describe('can-submit gating', () => {
     const { screening } = await newCasefile('gating');
     await page.goto(`/agency/screenings/${screening.id}`);
 
-    const submit = page.getByRole('button', { name: /submit casefile/i });
+    const submit = page.getByRole('button', { name: /submit screening/i });
     await expect(submit).toBeDisabled();
 
     // Banner should show required questions (2 required in the test template).
@@ -46,7 +46,7 @@ test.describe('can-submit gating', () => {
     await likert.locator('.likert-opt').nth(3).click();
 
     await page.waitForTimeout(1200);
-    await expect(page.getByRole('button', { name: /submit casefile/i })).toBeEnabled({ timeout: 5_000 });
+    await expect(page.getByRole('button', { name: /submit screening/i })).toBeEnabled({ timeout: 5_000 });
     await expect(page.getByText(/ready to submit/i)).toBeVisible();
   });
 
@@ -71,7 +71,7 @@ test.describe('can-submit gating', () => {
 });
 
 test.describe('submit lifecycle', () => {
-  test('submit locks the casefile and persists final score + band', async ({ page }) => {
+  test('submit locks the screening and persists final score + band', async ({ page }) => {
     const { screening } = await newCasefile('lock');
     await page.goto(`/agency/screenings/${screening.id}`);
 
@@ -86,7 +86,7 @@ test.describe('submit lifecycle', () => {
     const liveNumeral = (await page.locator('.score-numeral').textContent())?.trim() ?? '';
     const liveBand = (await page.locator('.score-band-chip').textContent())?.trim() ?? '';
 
-    await page.getByRole('button', { name: /submit casefile/i }).click();
+    await page.getByRole('button', { name: /submit screening/i }).click();
 
     // Lock assertions.
     await expect(page.getByText(/submitted · locked/i)).toBeVisible({ timeout: 5_000 });
@@ -113,7 +113,7 @@ test.describe('submit lifecycle', () => {
     await tf.locator('.opt').first().click();
     await page.locator('.likert-opt').nth(3).click();
     await page.waitForTimeout(1200);
-    await page.getByRole('button', { name: /submit casefile/i }).click();
+    await page.getByRole('button', { name: /submit screening/i }).click();
     await expect(page.getByText(/submitted · locked/i)).toBeVisible();
 
     // Radio inputs should all be disabled post-submit.
@@ -141,7 +141,7 @@ test.describe('submit lifecycle', () => {
     await expect(tf.locator('.opt').nth(1)).not.toHaveClass(/selected/);
   });
 
-  test('submitted casefile reappears in the ledger with submitted badge and score', async ({ page }) => {
+  test('submitted screening reappears in the ledger with submitted badge and score', async ({ page }) => {
     const { screening, client } = await newCasefile('ledger-roundtrip');
     await page.goto(`/agency/screenings/${screening.id}`);
 
@@ -151,11 +151,11 @@ test.describe('submit lifecycle', () => {
     await tf.locator('.opt').first().click();
     await page.locator('.likert-opt').nth(4).click();
     await page.waitForTimeout(1200);
-    await page.getByRole('button', { name: /submit casefile/i }).click();
+    await page.getByRole('button', { name: /submit screening/i }).click();
     await expect(page.getByText(/submitted · locked/i)).toBeVisible();
 
     // Jump back to the ledger.
-    await page.getByRole('link', { name: 'Back to casefiles' }).click();
+    await page.getByRole('link', { name: 'Back to screenings' }).click();
     await expect(page).toHaveURL(/\/agency\/screenings$/);
 
     const row = page.locator('tbody tr', { hasText: client.name }).first();

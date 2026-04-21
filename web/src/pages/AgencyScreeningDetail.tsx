@@ -4,8 +4,6 @@ import { api, ScreeningDetail, Question, Section } from '../api';
 import { PageHead } from '../components/PageHead';
 import { StatusBadge } from '../components/Badge';
 
-const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-
 type AnswerMap = Map<
   string,
   { selectedOptionId: string | null; numericValue: number | null; note: string | null }
@@ -71,7 +69,7 @@ export function AgencyScreeningDetail() {
     };
   }, [dirtyQuestionIds, answers, detail, locked]);
 
-  if (!detail) return <div className="loading">Opening casefile…</div>;
+  if (!detail) return <div className="loading">Loading screening…</div>;
 
   const updateAnswer = (
     qid: string,
@@ -110,7 +108,7 @@ export function AgencyScreeningDetail() {
 
   // Computed values
   const scoring = detail.liveScoring;
-  const bandColor = scoring.band?.color ?? 'var(--ink-0)';
+  const bandColor = scoring.band?.color ?? 'var(--ink)';
   const bandLabel = scoring.band?.label ?? 'Unscored';
 
   return (
@@ -118,15 +116,15 @@ export function AgencyScreeningDetail() {
       <PageHead
         eyebrow={
           <>
-            <Link to="/agency/screenings" style={{ color: 'var(--ink-3)' }}>
-              Casefiles
+            <Link to="/agency/screenings" style={{ color: 'var(--ink-muted)' }}>
+              Screenings
             </Link>{' '}
             / {detail.snapshot.name} · v{detail.snapshot.version}
           </>
         }
         title={detail.clientName}
         dek={detail.snapshot.description ?? undefined}
-        note={`Casefile ${detail.id.slice(0, 8)} · opened ${new Date(detail.startedAt).toLocaleDateString()}`}
+        note={`Screening ${detail.id.slice(0, 8)} · started ${new Date(detail.startedAt).toLocaleDateString()}`}
         actions={<StatusBadge status={detail.status} />}
       />
 
@@ -162,7 +160,7 @@ export function AgencyScreeningDetail() {
               <li key={q.id}>{q.prompt}</li>
             ))}
             {detail.canSubmit.blockingQuestions.length > 5 && (
-              <li style={{ listStyle: 'none', color: 'var(--ink-3)' }}>
+              <li style={{ listStyle: 'none', color: 'var(--ink-muted)' }}>
                 … and {detail.canSubmit.blockingQuestions.length - 5} more
               </li>
             )}
@@ -182,7 +180,7 @@ export function AgencyScreeningDetail() {
           return (
             <section key={section.id}>
               <div className="section-head">
-                <span className="numeral">§&nbsp;{ROMAN[i + 1]}</span>
+                <span className="numeral">Section {i + 1}</span>
                 <h2>{section.title}</h2>
                 <span className="weight-note">weight × {section.weight}</span>
               </div>
@@ -202,14 +200,14 @@ export function AgencyScreeningDetail() {
       <div style={{ height: 40 }} />
       <div className="toolbar-end">
         <Link className="btn quiet" to="/agency/screenings">
-          Back to casefiles
+          Back to screenings
         </Link>
         <button
           className="btn"
           onClick={onSubmit}
           disabled={locked || !detail.canSubmit.canSubmit}
         >
-          {locked ? 'Submitted' : 'Submit casefile'}
+          {locked ? 'Submitted' : 'Submit screening'}
         </button>
       </div>
     </div>

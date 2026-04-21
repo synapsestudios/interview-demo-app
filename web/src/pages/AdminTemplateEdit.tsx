@@ -146,8 +146,6 @@ function draftToPayload(d: DraftTemplate): TemplateMutationPayload {
 
 /* -------------------------------------------------------------------------- */
 
-const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-
 export function AdminTemplateEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -164,15 +162,15 @@ export function AdminTemplateEdit() {
     });
   }, [id]);
 
-  if (!draft) return <div className="loading">Opening the instrument…</div>;
+  if (!draft) return <div className="loading">Loading template…</div>;
 
   if (draft.status !== 'draft') {
     return (
       <div className="stagger">
         <PageHead
-          eyebrow={<Link to="/admin/templates" style={{ color: 'var(--ink-3)' }}>Instruments</Link>}
+          eyebrow={<Link to="/admin/templates" style={{ color: 'var(--ink-muted)' }}>Templates</Link>}
           title={draft.name}
-          dek={`This instrument is ${draft.status} and cannot be edited. Fork it from the instruments list to create an editable draft.`}
+          dek={`This template is ${draft.status} and cannot be edited. Fork it from the templates list to create an editable draft.`}
           note={`v${draft.version}`}
         />
         <Link to={`/admin/templates/${draft.id}`} className="btn quiet">View preview</Link>
@@ -490,10 +488,10 @@ export function AdminTemplateEdit() {
       <PageHead
         eyebrow={
           <>
-            <Link to="/admin/templates" style={{ color: 'var(--ink-3)' }}>Instruments</Link> / Editing draft
+            <Link to="/admin/templates" style={{ color: 'var(--ink-muted)' }}>Templates</Link> / Editing draft
           </>
         }
-        title={draft.name || 'Untitled instrument'}
+        title={draft.name || 'Untitled template'}
         dek={`v${draft.version} · ${draft.sections.length} sections · ${draft.sections.reduce((n, s) => n + s.questions.length, 0)} questions`}
         note={dirty ? 'Unsaved changes' : 'Saved'}
         actions={
@@ -524,7 +522,7 @@ export function AdminTemplateEdit() {
 
       <div className="paper">
         <div className="paper-title">
-          <span className="eyebrow"><span className="num">§</span> Metadata</span>
+          <span className="eyebrow">Metadata</span>
         </div>
         <div className="editor-field-row">
           <label className="field-label">Name</label>
@@ -547,7 +545,7 @@ export function AdminTemplateEdit() {
 
       <div className="paper">
         <div className="paper-title">
-          <span className="eyebrow"><span className="num">§</span> Scoring bands</span>
+          <span className="eyebrow">Scoring bands</span>
           <div style={{ flex: 1 }} />
           <button className="btn quiet" onClick={addBand}>+ Band</button>
         </div>
@@ -667,12 +665,12 @@ function SectionEditor({
   return (
     <div className="paper">
       <div className="section-head" style={{ marginTop: 0 }}>
-        <span className="numeral">§&nbsp;{ROMAN[index + 1]}</span>
+        <span className="numeral">Section {index + 1}</span>
         <input
           className="field-input"
           value={section.title}
           onChange={(e) => onUpdateSection({ title: e.target.value })}
-          style={{ flex: 1, fontFamily: 'var(--serif)', fontSize: 20, padding: '6px 8px' }}
+          style={{ flex: 1, fontSize: 16, padding: '7px 10px', fontWeight: 600 }}
           aria-label="Section title"
         />
         <label style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-3)' }}>
@@ -774,7 +772,7 @@ function QuestionEditor({
           value={question.prompt}
           onChange={(e) => onUpdate({ prompt: e.target.value })}
           placeholder="Question prompt…"
-          style={{ flex: 1, fontFamily: 'var(--serif)', fontSize: 17 }}
+          style={{ flex: 1, fontSize: 14.5, fontWeight: 500 }}
           aria-label="Question prompt"
         />
         <button className="tool-btn" onClick={() => onMove(-1)} disabled={index === 0} aria-label="Move up">↑</button>
@@ -809,8 +807,8 @@ function QuestionEditor({
       </div>
 
       <div style={{ marginTop: 12 }}>
-        <div className="eyebrow" style={{ marginBottom: 6 }}>
-          <span className="num">§</span> {question.type === 'likert' ? 'Likert scores (1–5)' : 'Options'}
+        <div className="eyebrow" style={{ marginBottom: 8 }}>
+          {question.type === 'likert' ? 'Likert scores (1–5)' : 'Options'}
         </div>
         {question.options.map((o, oi) => (
           <div key={o.id} className="option-row">
@@ -850,8 +848,8 @@ function QuestionEditor({
       </div>
 
       <div style={{ marginTop: 14 }}>
-        <div className="eyebrow" style={{ marginBottom: 6 }}>
-          <span className="num">§</span> Conditional visibility
+        <div className="eyebrow" style={{ marginBottom: 8 }}>
+          Conditional visibility
         </div>
         {question.conditionals.length === 0 && (
           <button className="btn quiet" onClick={onAddConditional}>+ Show only when…</button>

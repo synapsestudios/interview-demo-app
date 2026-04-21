@@ -1,6 +1,6 @@
-# Arbiter — Screening & Assessment System
+# Arbiter — Case management
 
-A template-based survey/assessment engine. Administrators author reusable screening instruments (sections, questions, scoring bands, conditional logic); agencies use those instruments to run screenings on their clients and view aggregated results.
+A template-based screening and assessment tool for case-management teams. Admins author reusable assessment templates (sections, questions, scoring bands, conditional visibility); case workers at agencies run screenings against their clients, track live scores, submit locked records, and review aggregated reports.
 
 ## Stack
 
@@ -26,14 +26,14 @@ cd web && npm install && npm run dev
 cd web && npm run test:e2e
 ```
 
-Playwright covers: masthead + mode toggle, template list + publish/fork/archive, screenings ledger + filters + CSV export, screening detail (all three question types, conditional visibility, live scoring, per-answer notes, can-submit gating, submit lifecycle + lock), and the aggregate dashboard. Tests require the API + seed data to be running; the suite's `globalSetup` reseeds the database at the start of the run.
+Playwright covers: masthead + Admin/Clinical toggle, template list + publish/fork/archive, template authoring (create, sections/questions/options/bands/conditionals, save, publish), screenings ledger + filters + CSV export, screening detail (all three question types, conditional visibility, live scoring, per-answer notes, can-submit gating, submit lifecycle + lock), and the aggregate reports dashboard. Tests require the API + seed data; the suite's `globalSetup` reseeds the database at the start of the run.
 
 ## Structure
 
 ```
 arbiter/
   api/                NestJS REST API
-  web/                React client (Editorial = admin mode, Field = agency mode)
+  web/                React client (Admin + Clinical modes)
   docker-compose.yml
 ```
 

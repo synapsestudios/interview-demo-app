@@ -4,13 +4,11 @@ import { useAsync } from '../hooks/useAsync';
 import { StatusBadge, BandChip } from '../components/Badge';
 import { PageHead } from '../components/PageHead';
 
-const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-
 export function AdminTemplateDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: t, loading } = useAsync(() => api.getTemplate(id!), [id]);
 
-  if (loading || !t) return <div className="loading">Retrieving instrument…</div>;
+  if (loading || !t) return <div className="loading">Loading template…</div>;
 
   const totalQuestions = t.sections.reduce((n, s) => n + s.questions.length, 0);
   const totalConds = t.sections.reduce(
@@ -23,8 +21,8 @@ export function AdminTemplateDetail() {
       <PageHead
         eyebrow={
           <>
-            <Link to="/admin/templates" style={{ color: 'var(--ink-3)' }}>
-              Instruments
+            <Link to="/admin/templates" style={{ color: 'var(--ink-muted)' }}>
+              Templates
             </Link>{' '}
             / {t.status.toUpperCase()}
           </>
@@ -46,16 +44,14 @@ export function AdminTemplateDetail() {
 
       {t.status !== 'draft' && (
         <div className="banner locked">
-          <div className="hdr">Instrument locked</div>
-          This instrument is {t.status}. To revise, fork it from the instruments list — v{t.version + 1} will be created as an independent draft. In-flight casefiles continue to use their captured snapshot.
+          <div className="hdr">Template locked</div>
+          This template is {t.status}. To revise, fork it from the templates list — v{t.version + 1} will be created as an independent draft. In-flight screenings continue to use their captured snapshot.
         </div>
       )}
 
       <div className="paper">
         <div className="paper-title">
-          <span className="eyebrow">
-            <span className="num">§</span> Scoring bands
-          </span>
+          <span className="eyebrow">Scoring bands</span>
         </div>
         <table className="ledger">
           <thead>
@@ -79,9 +75,10 @@ export function AdminTemplateDetail() {
                   <span
                     style={{
                       display: 'inline-block',
-                      width: 40,
-                      height: 10,
+                      width: 48,
+                      height: 8,
                       background: b.color,
+                      borderRadius: 2,
                     }}
                   />
                 </td>
@@ -94,10 +91,9 @@ export function AdminTemplateDetail() {
       {t.sections
         .slice()
         .sort((a, b) => a.order - b.order)
-        .map((s, i) => (
+        .map((s) => (
           <section key={s.id}>
             <div className="section-head">
-              <span className="numeral">§&nbsp;{ROMAN[i + 1]}</span>
               <h2>{s.title}</h2>
               <span className="weight-note">weight × {s.weight}</span>
             </div>
@@ -133,17 +129,17 @@ export function AdminTemplateDetail() {
                             display: 'grid',
                             gridTemplateColumns: '1fr auto',
                             alignItems: 'baseline',
-                            borderBottom: '1px dashed var(--rule-hair)',
+                            borderBottom: '1px dashed var(--rule)',
                             padding: '6px 0',
-                            fontSize: 14,
+                            fontSize: 13.5,
                           }}
                         >
                           <span>{o.label}</span>
                           <span
                             style={{
                               fontFamily: 'var(--mono)',
-                              fontSize: 11.5,
-                              color: 'var(--ink-3)',
+                              fontSize: 11,
+                              color: 'var(--ink-muted)',
                             }}
                           >
                             + {o.score}
@@ -153,7 +149,7 @@ export function AdminTemplateDetail() {
                     </ul>
                   )}
                   {q.type === 'likert' && (
-                    <div style={{ marginTop: 12, fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--ink-3)' }}>
+                    <div style={{ marginTop: 10, fontFamily: 'var(--mono)', fontSize: 11.5, color: 'var(--ink-muted)' }}>
                       1 — {q.options[0]?.label} · 5 — {q.options[4]?.label}
                     </div>
                   )}

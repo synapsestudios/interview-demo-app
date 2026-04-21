@@ -12,7 +12,7 @@ test.describe('dashboard', () => {
     await page.goto('/agency/dashboard');
     await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
 
-    await expect(page.getByRole('heading', { name: 'Compendium' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Reports' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Score distribution' })).toBeVisible();
     await expect(page.getByRole('heading', { name: /band counts/i })).toBeVisible();
 
@@ -50,7 +50,7 @@ test.describe('dashboard', () => {
     expect(options.length).toBeGreaterThanOrEqual(2);
   });
 
-  test('empty state when agency has no submitted casefiles', async ({ page }) => {
+  test('empty state when agency has no submitted screenings', async ({ page }) => {
     await page.goto('/agency/dashboard');
     await page.getByLabel('Select agency').selectOption({ label: 'Summit Partners' });
 

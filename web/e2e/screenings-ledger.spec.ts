@@ -23,7 +23,7 @@ test.describe('screenings ledger', () => {
 
     // Required columns.
     await expect(page.getByRole('columnheader', { name: 'Client' })).toBeVisible();
-    await expect(page.getByRole('columnheader', { name: 'Instrument' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Template' })).toBeVisible();
     await expect(page.getByRole('columnheader', { name: 'Status' })).toBeVisible();
     await expect(page.getByRole('columnheader', { name: 'Started' })).toBeVisible();
     await expect(page.getByRole('columnheader', { name: 'Submitted' })).toBeVisible();
@@ -130,7 +130,7 @@ test.describe('new casefile composer', () => {
     if (!tplChoice) throw new Error('no template available in composer');
     await composerTemplateSelect.selectOption({ label: tplChoice });
 
-    await page.getByRole('button', { name: /open casefile/i }).click();
+    await page.getByRole('button', { name: /start screening/i }).click();
     await expect(page).toHaveURL(/\/agency\/screenings\/[0-9a-f-]+/);
     await expect(page.getByRole('heading', { level: 1, name: clientName })).toBeVisible();
   });

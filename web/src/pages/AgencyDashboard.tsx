@@ -75,14 +75,14 @@ export function AgencyDashboard({ agencyId }: { agencyId: string }) {
   return (
     <div className="stagger">
       <PageHead
-        eyebrow="§ III · Compendium"
-        title="Compendium"
-        dek="Aggregated view across all submitted casefiles for this instrument. Drafts are omitted. Each instrument version shares a single lineage in this view."
-        note={dist ? `${totalSubmitted} submitted casefiles plotted` : 'Loading…'}
+        eyebrow="Clinical"
+        title="Reports"
+        dek="Aggregated view across all submitted screenings for this template. Drafts are omitted. Each template version shares a single lineage in this view."
+        note={dist ? `${totalSubmitted} submitted screenings plotted` : 'Loading…'}
       />
 
       <div className="filters" style={{ marginBottom: 22 }}>
-        <span className="filter-label">Instrument</span>
+        <span className="filter-label">Template</span>
         <select
           className="select"
           value={selected}
@@ -112,32 +112,32 @@ export function AgencyDashboard({ agencyId }: { agencyId: string }) {
             {dist ? (
               <ResponsiveContainer>
                 <BarChart data={dist} margin={{ top: 14, right: 16, left: 0, bottom: 10 }}>
-                  <CartesianGrid vertical={false} stroke="#d9d0b9" strokeDasharray="2 4" />
+                  <CartesianGrid vertical={false} stroke="#e4e3dd" strokeDasharray="2 4" />
                   <XAxis
                     dataKey="bucketStart"
                     tickFormatter={(v) => `${v}`}
-                    tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#8a8172' }}
-                    axisLine={{ stroke: '#a89e88' }}
-                    tickLine={{ stroke: '#a89e88' }}
+                    tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#6b7280' }}
+                    axisLine={{ stroke: '#cfcec7' }}
+                    tickLine={{ stroke: '#cfcec7' }}
                   />
                   <YAxis
                     allowDecimals={false}
-                    tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#8a8172' }}
+                    tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#6b7280' }}
                     axisLine={false}
                     tickLine={false}
                     width={28}
                   />
                   <Tooltip
-                    cursor={{ fill: 'rgba(16,11,8,0.04)' }}
+                    cursor={{ fill: 'rgba(16,21,28,0.04)' }}
                     contentStyle={journalTooltip}
                     labelFormatter={(l) => `${l}–${Number(l) + 10}`}
                   />
-                  <Bar dataKey="count" fill="#1a140e" radius={0} />
+                  <Bar dataKey="count" fill="#0f6f64" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="loading" style={{ padding: '40px 0' }}>
-                Plotting distribution…
+                Loading distribution…
               </div>
             )}
           </div>
@@ -150,36 +150,36 @@ export function AgencyDashboard({ agencyId }: { agencyId: string }) {
             {band ? (
               bandChartData.length === 0 ? (
                 <div className="empty" style={{ padding: '40px 0' }}>
-                  No submitted casefiles yet.
+                  No submitted screenings yet.
                 </div>
               ) : (
                 <ResponsiveContainer>
                   <BarChart data={bandChartData} margin={{ top: 14, right: 16, left: 0, bottom: 10 }}>
-                    <CartesianGrid vertical={false} stroke="#d9d0b9" strokeDasharray="2 4" />
+                    <CartesianGrid vertical={false} stroke="#e4e3dd" strokeDasharray="2 4" />
                     <XAxis
                       dataKey="month"
-                      tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#8a8172' }}
-                      axisLine={{ stroke: '#a89e88' }}
-                      tickLine={{ stroke: '#a89e88' }}
+                      tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#6b7280' }}
+                      axisLine={{ stroke: '#cfcec7' }}
+                      tickLine={{ stroke: '#cfcec7' }}
                     />
                     <YAxis
                       allowDecimals={false}
-                      tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#8a8172' }}
+                      tick={{ fontFamily: 'var(--mono)', fontSize: 11, fill: '#6b7280' }}
                       axisLine={false}
                       tickLine={false}
                       width={28}
                     />
-                    <Tooltip cursor={{ fill: 'rgba(16,11,8,0.04)' }} contentStyle={journalTooltip} />
+                    <Tooltip cursor={{ fill: 'rgba(16,21,28,0.04)' }} contentStyle={journalTooltip} />
                     <Legend
-                      wrapperStyle={{ fontFamily: 'var(--sans)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4a4239' }}
+                      wrapperStyle={{ fontFamily: 'var(--sans)', fontSize: 11, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#3a424d', paddingTop: 10 }}
                     />
                     {[...bandLabels, ...discoverExtraBands(bandChartData, bandLabels)].map((lbl) => (
                       <Bar
                         key={lbl}
                         dataKey={lbl}
                         stackId="a"
-                        fill={bandColorByLabel.get(lbl) ?? '#1a140e'}
-                        radius={0}
+                        fill={bandColorByLabel.get(lbl) ?? '#0f6f64'}
+                        radius={[2, 2, 0, 0]}
                       />
                     ))}
                   </BarChart>
@@ -187,7 +187,7 @@ export function AgencyDashboard({ agencyId }: { agencyId: string }) {
               )
             ) : (
               <div className="loading" style={{ padding: '40px 0' }}>
-                Plotting months…
+                Loading months…
               </div>
             )}
           </div>
@@ -198,13 +198,14 @@ export function AgencyDashboard({ agencyId }: { agencyId: string }) {
 }
 
 const journalTooltip = {
-  background: '#faf6ed',
-  border: '1px solid #4a4239',
-  borderRadius: 0,
+  background: '#ffffff',
+  border: '1px solid #cfcec7',
+  borderRadius: 6,
   fontFamily: 'IBM Plex Mono, monospace',
   fontSize: 12,
-  color: '#1a140e',
+  color: '#10151c',
   padding: '8px 10px',
+  boxShadow: '0 1px 2px rgba(16, 21, 28, 0.04), 0 4px 16px rgba(16, 21, 28, 0.05)',
 };
 
 function discoverExtraBands(

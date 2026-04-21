@@ -77,9 +77,9 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
   return (
     <div className="stagger">
       <PageHead
-        eyebrow="§ II · Field"
-        title="Casefiles"
-        dek="Screenings run against clients. Drafts are private to this agency; submissions are immutable and feed the Compendium."
+        eyebrow="Clinical"
+        title="Screenings"
+        dek="Assessment screenings run against clients. Drafts are private to this agency; submissions are immutable and feed the reports."
         note={
           screenings
             ? `${screenings.length} on file — ${screenings.filter((s) => s.status === 'submitted').length} submitted`
@@ -104,7 +104,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
           </select>
         </div>
         <div className="f">
-          <label>Instrument</label>
+          <label>Template</label>
           <select
             className="select"
             value={composerTemplate}
@@ -141,7 +141,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
           onClick={onStart}
           disabled={!composerClient || !composerTemplate}
         >
-          Open casefile
+          Start screening
         </button>
       </div>
 
@@ -157,7 +157,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
             <option value="submitted">Submitted</option>
           </select>
           <span className="filter-label" style={{ marginLeft: 12 }}>
-            Instrument
+            Template
           </span>
           <select
             className="select"
@@ -181,10 +181,10 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
         </div>
 
         {screenings === null ? (
-          <div className="loading">Gathering casefiles…</div>
+          <div className="loading">Loading screenings…</div>
         ) : screenings.length === 0 ? (
           <div className="empty">
-            No casefiles match.
+            No screenings match.
             <span className="sub">Try relaxing the filters above.</span>
           </div>
         ) : (
@@ -192,7 +192,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
             <thead>
               <tr>
                 <th style={{ width: '20%' }}>Client</th>
-                <th>Instrument</th>
+                <th>Template</th>
                 <th>Status</th>
                 <th>Started</th>
                 <th>Submitted</th>
@@ -207,7 +207,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
                     <Link
                       to={`/agency/screenings/${s.id}`}
                       onClick={(e) => e.stopPropagation()}
-                      style={{ fontFamily: 'var(--serif)', fontSize: 16.5, color: 'var(--ink-0)' }}
+                      style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}
                     >
                       {s.clientName}
                     </Link>
@@ -217,7 +217,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
                   </td>
                   <td>
                     {s.templateName}{' '}
-                    <span className="num" style={{ marginLeft: 4, color: 'var(--ink-3)' }}>
+                    <span className="num" style={{ marginLeft: 4, color: 'var(--ink-muted)' }}>
                       v{s.templateVersion}
                     </span>
                   </td>
@@ -230,7 +230,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
                     {s.finalScore !== null ? (
                       <span className="big-num">{s.finalScore.toFixed(1)}</span>
                     ) : (
-                      <span style={{ color: 'var(--ink-3)' }}>—</span>
+                      <span style={{ color: 'var(--ink-muted)' }}>—</span>
                     )}
                   </td>
                   <td>
@@ -242,7 +242,7 @@ export function AgencyScreenings({ agencyId }: { agencyId: string }) {
                         {s.finalBand}
                       </span>
                     ) : (
-                      <span style={{ color: 'var(--ink-3)' }}>—</span>
+                      <span style={{ color: 'var(--ink-muted)' }}>—</span>
                     )}
                   </td>
                 </tr>

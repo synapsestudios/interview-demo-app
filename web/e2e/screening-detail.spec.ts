@@ -20,8 +20,8 @@ test.describe('screening detail rendering', () => {
 
     await expect(page.getByRole('heading', { level: 1, name: client.name })).toBeVisible();
     await expect(page.locator('.score-plate')).toBeVisible();
-    await expect(page.locator('.section-head .numeral', { hasText: /§\s*I\b/ })).toBeVisible();
-    await expect(page.locator('.section-head .numeral', { hasText: /§\s*II\b/ })).toBeVisible();
+    await expect(page.locator('.section-head .numeral', { hasText: 'Section 1' })).toBeVisible();
+    await expect(page.locator('.section-head .numeral', { hasText: 'Section 2' })).toBeVisible();
 
     // All three input shapes are rendered somewhere in the form.
     await expect(page.locator('.question .meta', { hasText: 'true_false' }).first()).toBeVisible();

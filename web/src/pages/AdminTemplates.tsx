@@ -21,14 +21,14 @@ export function AdminTemplates() {
   const onCreate = async () => {
     setCreating(true);
     try {
-      const t = await api.createTemplate({ name: 'Untitled instrument' });
+      const t = await api.createTemplate({ name: 'Untitled template' });
       navigate(`/admin/templates/${t.id}/edit`);
     } finally {
       setCreating(false);
     }
   };
 
-  if (loading) return <div className="loading">Gathering instruments…</div>;
+  if (loading) return <div className="loading">Loading templates…</div>;
   if (!data) return <div className="empty">No templates available.</div>;
 
   const sorted = [...data].sort((a, b) => {
@@ -55,13 +55,13 @@ export function AdminTemplates() {
   return (
     <div className="stagger">
       <PageHead
-        eyebrow="§ I · Editorial"
-        title="Screening instruments"
-        dek="Reusable assessment templates. Publish to release to the field; fork to propose a revision without affecting in-flight casefiles."
-        note={`${data.length} instruments on file`}
+        eyebrow="Admin"
+        title="Templates"
+        dek="Reusable assessment templates. Publish to make available for screenings; fork a published template to propose a revision without affecting in-flight records."
+        note={`${data.length} on file`}
         actions={
           <button className="btn" onClick={onCreate} disabled={creating}>
-            {creating ? 'Creating…' : '+ New instrument'}
+            {creating ? 'Creating…' : '+ New template'}
           </button>
         }
       />
@@ -70,7 +70,7 @@ export function AdminTemplates() {
         <table className="ledger">
           <thead>
             <tr>
-              <th style={{ width: '36%' }}>Instrument</th>
+              <th style={{ width: '36%' }}>Template</th>
               <th>Version</th>
               <th>Status</th>
               <th>Lineage</th>
@@ -111,13 +111,13 @@ function TemplateRow({
       <td>
         <Link
           to={`/admin/templates/${t.id}`}
-          style={{ fontFamily: 'var(--serif)', fontSize: 17, color: 'var(--ink-0)' }}
+          style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}
           onClick={(e) => e.stopPropagation()}
         >
           {t.name}
         </Link>
         {t.description && (
-          <div style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 4, maxWidth: '48ch' }}>
+          <div style={{ fontSize: 12, color: 'var(--ink-muted)', marginTop: 4, maxWidth: '56ch' }}>
             {t.description}
           </div>
         )}

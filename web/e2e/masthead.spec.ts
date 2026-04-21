@@ -1,40 +1,39 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('masthead & mode toggle', () => {
-  test('renders wordmark, tagline, volume', async ({ page }) => {
+  test('renders wordmark and tagline', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByText('Arbiter', { exact: true })).toBeVisible();
-    await expect(page.getByText('Screening & Assessment System')).toBeVisible();
-    await expect(page.getByText(/Vol\. III · № 04/)).toBeVisible();
+    await expect(page.locator('.masthead .tagline')).toHaveText('Case management');
   });
 
-  test('Editorial / Field toggle switches routes and nav links', async ({ page }) => {
+  test('Admin / Clinical toggle switches routes and nav links', async ({ page }) => {
     await page.goto('/');
-    // Default lands in Field (agency mode).
-    await page.getByRole('tab', { name: 'Editorial' }).click();
+    // Default lands in Clinical (agency mode).
+    await page.getByRole('tab', { name: 'Admin' }).click();
     await expect(page).toHaveURL(/\/admin\/templates/);
-    await expect(page.getByRole('link', { name: 'Instruments' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Templates' })).toBeVisible();
 
-    await page.getByRole('tab', { name: 'Field' }).click();
+    await page.getByRole('tab', { name: 'Clinical' }).click();
     await expect(page).toHaveURL(/\/agency\/screenings/);
-    await expect(page.getByRole('link', { name: 'Casefiles' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Compendium' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Screenings' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Reports' })).toBeVisible();
   });
 
   test('mode persists across reload', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('tab', { name: 'Editorial' }).click();
+    await page.getByRole('tab', { name: 'Admin' }).click();
     await page.reload();
-    await expect(page.getByRole('tab', { name: 'Editorial' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tab', { name: 'Admin' })).toHaveAttribute('aria-selected', 'true');
     await expect(page).toHaveURL(/\/admin\/templates/);
   });
 
-  test('agency dropdown only visible in Field mode', async ({ page }) => {
+  test('agency dropdown only visible in Clinical mode', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('tab', { name: 'Editorial' }).click();
+    await page.getByRole('tab', { name: 'Admin' }).click();
     await expect(page.getByLabel('Select agency')).toHaveCount(0);
 
-    await page.getByRole('tab', { name: 'Field' }).click();
+    await page.getByRole('tab', { name: 'Clinical' }).click();
     await expect(page.getByLabel('Select agency')).toBeVisible();
   });
 
