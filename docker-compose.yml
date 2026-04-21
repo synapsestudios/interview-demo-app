@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: survey-prototype-postgres
+    environment:
+      POSTGRES_USER: survey
+      POSTGRES_PASSWORD: survey
+      POSTGRES_DB: survey
+    ports:
+      - "5434:5432"
+    volumes:
+      - survey-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U survey -d survey"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  survey-postgres-data:
