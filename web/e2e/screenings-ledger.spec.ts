@@ -135,6 +135,31 @@ test.describe('new casefile composer', () => {
     await expect(page.getByRole('heading', { level: 1, name: clientName })).toBeVisible();
   });
 
+  test('stale agencyId in localStorage is ignored and replaced with a valid agency', async ({ page }) => {
+    // Simulate a stale agencyId (a valid-shaped UUID that isn't in the DB). Without the
+    // client-side guard this would send FK-violating writes and previously returned 500.
+    await page.addInitScript(() => {
+      localStorage.setItem('mode', 'agency');
+      localStorage.setItem('agencyId', '00000000-0000-0000-0000-000000000000');
+    });
+    await page.goto('/agency/screenings');
+    // Wait for the App useEffect to fetch agencies and replace the stored id.
+    await expect
+      .poll(async () => page.getByLabel('Select agency').inputValue())
+      .toMatch(/^[0-9a-f-]{36}$/);
+    const selected = await page.getByLabel('Select agency').inputValue();
+    expect(selected).not.toEqual('00000000-0000-0000-0000-000000000000');
+  });
+
+  test('API returns 404, not 500, when creating a client with an unknown agencyId', async ({ request }) => {
+    const res = await request.post('http://localhost:3001/api/clients', {
+      data: { agencyId: '00000000-0000-0000-0000-000000000000', name: 'Ghost' },
+    });
+    expect(res.status()).toBe(404);
+    const body = await res.json();
+    expect(body.message).toMatch(/referenced record/i);
+  });
+
   test('add-client inline flow adds a new client and selects it', async ({ page }) => {
     const acme = await fx.getAgencyByName('Acme Health');
 

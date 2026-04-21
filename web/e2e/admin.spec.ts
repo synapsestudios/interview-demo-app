@@ -10,10 +10,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('admin: templates list + status', () => {
   test('lists all seeded templates with correct status badges', async ({ page }) => {
     await page.goto('/admin/templates');
-    const rows = page.locator('tbody tr');
-    const rowCount = await rows.count();
-    expect(rowCount).toBeGreaterThanOrEqual(3);
-
+    await expect.poll(async () => page.locator('tbody tr').count()).toBeGreaterThanOrEqual(3);
     await expect(page.locator('.badge.status-published').first()).toBeVisible();
     await expect(page.locator('.badge.status-archived').first()).toBeVisible();
   });

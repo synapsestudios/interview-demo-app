@@ -21,11 +21,18 @@ export default function App() {
   useEffect(() => {
     api.listAgencies().then((list) => {
       setAgencies(list);
-      if (!agencyId && list[0]) {
+      // Reset agencyId if it's missing OR if it's no longer in the list (stale
+      // localStorage after a reseed would otherwise cause 500s on downstream writes).
+      const stored = localStorage.getItem('agencyId') ?? '';
+      const valid = list.some((a) => a.id === stored);
+      if (!valid && list[0]) {
         setAgencyId(list[0].id);
         localStorage.setItem('agencyId', list[0].id);
+      } else if (valid) {
+        setAgencyId(stored);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
