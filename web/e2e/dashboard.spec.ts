@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('dashboard', () => {
   test('renders histogram and stacked-bar charts for Acme + v1', async ({ page }) => {
     await page.goto('/agency/dashboard');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
 
     await expect(page.getByRole('heading', { name: 'Reports' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Score distribution' })).toBeVisible();
@@ -27,7 +27,7 @@ test.describe('dashboard', () => {
   test('band chips above charts reflect the template scoring bands', async ({ page }) => {
     const tpl = await fx.getFirstPublishedV1();
     await page.goto('/agency/dashboard');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
 
     // Pick the seeded v1 explicitly.
     await page.locator('.filters .select').first().selectOption({ value: tpl.id });
@@ -42,9 +42,9 @@ test.describe('dashboard', () => {
     const picker = page.locator('.filters .select').first();
     const options = await picker.locator('option').allTextContents();
 
-    // No archived templates appear — seeded archived one is "Legacy intake (deprecated)".
+    // No archived templates appear — seeded archived one is "Legacy perimeter checklist (deprecated)".
     for (const o of options) {
-      expect(o.toLowerCase()).not.toContain('legacy intake');
+      expect(o.toLowerCase()).not.toContain('legacy perimeter');
     }
     // At least the two published templates appear.
     expect(options.length).toBeGreaterThanOrEqual(2);
@@ -52,7 +52,7 @@ test.describe('dashboard', () => {
 
   test('empty state when agency has no submitted screenings', async ({ page }) => {
     await page.goto('/agency/dashboard');
-    await page.getByLabel('Select agency').selectOption({ label: 'Summit Partners' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Summit Audit Group' });
 
     // For Summit the band-counts card should render the empty state.
     // (Distribution histogram still renders with all-zero buckets.)

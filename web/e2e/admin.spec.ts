@@ -40,10 +40,10 @@ test.describe('admin: template detail rendering', () => {
     const tpl = await fx.getFirstPublishedV1();
     await page.goto(`/admin/templates/${tpl.id}`);
     await expect(page.getByText('Scoring bands')).toBeVisible();
-    // Seeded bands: High risk / Moderate risk / Low risk
-    await expect(page.getByText(/High risk/)).toBeVisible();
-    await expect(page.getByText(/Moderate risk/)).toBeVisible();
-    await expect(page.getByText(/Low risk/)).toBeVisible();
+    // Assert each seeded band label shows up in the template detail view.
+    for (const b of tpl.bands) {
+      await expect(page.getByText(b.label, { exact: false }).first()).toBeVisible();
+    }
   });
 
   test('published template shows locked banner', async ({ page }) => {

@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('screenings ledger', () => {
   test('lists seeded casefiles for Acme with correct columns', async ({ page }) => {
     await page.goto('/agency/screenings');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
 
     const rows = page.locator('tbody tr');
     await expect.poll(async () => rows.count()).toBeGreaterThan(0);
@@ -33,7 +33,7 @@ test.describe('screenings ledger', () => {
 
   test('submitted rows display a colored band chip', async ({ page }) => {
     await page.goto('/agency/screenings');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
     // Find any submitted row, then check its band chip.
     const submittedRow = page.locator('tbody tr').filter({ has: page.locator('.badge.status-submitted') }).first();
     await expect(submittedRow).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('screenings ledger', () => {
 
   test('filter by status narrows the ledger', async ({ page }) => {
     await page.goto('/agency/screenings');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
     await expect.poll(async () => page.locator('tbody tr').count()).toBeGreaterThan(0);
 
     const totalRows = await page.locator('tbody tr').count();
@@ -62,7 +62,7 @@ test.describe('screenings ledger', () => {
 
   test('filter by instrument narrows the ledger', async ({ page }) => {
     await page.goto('/agency/screenings');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
     await expect.poll(async () => page.locator('tbody tr').count()).toBeGreaterThan(0);
 
     // Capture template names shown.
@@ -79,7 +79,7 @@ test.describe('screenings ledger', () => {
 
   test('CSV export link carries agency + template filters', async ({ page }) => {
     await page.goto('/agency/screenings');
-    const acme = await fx.getAgencyByName('Acme Health');
+    const acme = await fx.getAgencyByName('Acme Security Partners');
     await page.getByLabel('Select agency').selectOption({ value: acme.id });
 
     const exportBtn = page.getByRole('link', { name: /export csv/i });
@@ -90,7 +90,7 @@ test.describe('screenings ledger', () => {
 
   test('clicking a ledger row opens its casefile detail', async ({ page }) => {
     await page.goto('/agency/screenings');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
     const firstClientLink = page.locator('tbody tr a').first();
     const clientName = (await firstClientLink.textContent())?.trim() ?? '';
     await firstClientLink.click();
@@ -100,10 +100,10 @@ test.describe('screenings ledger', () => {
 
   test('agency switch scopes ledger contents', async ({ page }) => {
     await page.goto('/agency/screenings');
-    await page.getByLabel('Select agency').selectOption({ label: 'Acme Health' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Acme Security Partners' });
     await expect.poll(async () => page.locator('tbody tr').count()).toBeGreaterThan(0);
 
-    await page.getByLabel('Select agency').selectOption({ label: 'Summit Partners' });
+    await page.getByLabel('Select agency').selectOption({ label: 'Summit Audit Group' });
     // Summit has zero seeded screenings.
     await expect(page.locator('.empty').first()).toBeVisible();
     await expect(page.locator('tbody tr')).toHaveCount(0);
@@ -112,7 +112,7 @@ test.describe('screenings ledger', () => {
 
 test.describe('new casefile composer', () => {
   test('pick client + instrument → opens a fresh draft casefile', async ({ page }) => {
-    const acme = await fx.getAgencyByName('Acme Health');
+    const acme = await fx.getAgencyByName('Acme Security Partners');
     const clientName = `Composer Client ${Date.now()}`;
     await fx.createClient(acme.id, clientName);
 
@@ -161,7 +161,7 @@ test.describe('new casefile composer', () => {
   });
 
   test('add-client inline flow adds a new client and selects it', async ({ page }) => {
-    const acme = await fx.getAgencyByName('Acme Health');
+    const acme = await fx.getAgencyByName('Acme Security Partners');
 
     await page.goto('/agency/screenings');
     await page.getByLabel('Select agency').selectOption({ value: acme.id });

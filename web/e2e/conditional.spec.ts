@@ -9,13 +9,13 @@ test.describe('conditional / skip logic', () => {
   test('dependent question is hidden until dependency is satisfied, appears when satisfied, disappears when dependency changes away', async ({
     page,
   }) => {
-    const acme = await fx.getAgencyByName('Acme Health');
+    const acme = await fx.getAgencyByName('Acme Security Partners');
     const client = await fx.createClient(acme.id, `Cond Client ${Date.now()}`);
     const tpl = await createTestTemplate(`cond-${Date.now()}`);
     const screening = await fx.createScreening(acme.id, client.id, tpl.id);
     await page.goto(`/agency/screenings/${screening.id}`);
 
-    const dependentPrompt = 'How long without stable housing?';
+    const dependentPrompt = 'When is MFA planned to be enforced?';
 
     // Initially: q_tf has no answer → dependent question must be hidden.
     await expect(page.getByText(dependentPrompt)).toHaveCount(0);
@@ -33,7 +33,7 @@ test.describe('conditional / skip logic', () => {
   });
 
   test('skipped (hidden) questions do not contribute to total visible count in score plate', async ({ page }) => {
-    const acme = await fx.getAgencyByName('Acme Health');
+    const acme = await fx.getAgencyByName('Acme Security Partners');
     const client = await fx.createClient(acme.id, `Cond Count ${Date.now()}`);
     const tpl = await createTestTemplate(`cond-count-${Date.now()}`);
     const screening = await fx.createScreening(acme.id, client.id, tpl.id);

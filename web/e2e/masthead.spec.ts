@@ -40,6 +40,6 @@ test.describe('masthead & mode toggle', () => {
   test('agency dropdown lists seeded agencies', async ({ page }) => {
     await page.goto('/agency/screenings');
     const options = page.getByLabel('Select agency').locator('option');
-    await expect(options).toContainText(['Acme Health', 'Northwind Services', 'Summit Partners']);
+    await expect(options).toContainText(['Acme Security Partners', 'Northwind AppSec', 'Summit Audit Group']);
   });
 });

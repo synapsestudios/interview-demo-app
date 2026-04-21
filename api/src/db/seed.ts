@@ -33,22 +33,26 @@ async function main() {
   await db.delete(clients);
   await db.delete(agencies);
 
-  // Agencies
+  // Agencies — security assessment firms running screenings against client applications.
   const [acmeAgency, northwindAgency, summitAgency] = await db
     .insert(agencies)
-    .values([{ name: 'Acme Health' }, { name: 'Northwind Services' }, { name: 'Summit Partners' }])
+    .values([
+      { name: 'Acme Security Partners' },
+      { name: 'Northwind AppSec' },
+      { name: 'Summit Audit Group' },
+    ])
     .returning();
 
-  // Clients
+  // Clients — each client is an application (or service) being assessed by the agency.
   const clientRows = await db
     .insert(clients)
     .values([
-      { agencyId: acmeAgency.id, name: 'Jane Doe' },
-      { agencyId: acmeAgency.id, name: 'John Smith' },
-      { agencyId: acmeAgency.id, name: 'Aaliyah Patel' },
-      { agencyId: northwindAgency.id, name: 'Miguel Torres' },
-      { agencyId: northwindAgency.id, name: 'Lin Wei' },
-      { agencyId: summitAgency.id, name: 'Petra Novak' },
+      { agencyId: acmeAgency.id, name: 'Checkout Service' },
+      { agencyId: acmeAgency.id, name: 'Admin Portal' },
+      { agencyId: acmeAgency.id, name: 'Billing API' },
+      { agencyId: northwindAgency.id, name: 'Mobile Gateway' },
+      { agencyId: northwindAgency.id, name: 'Data Export Job' },
+      { agencyId: summitAgency.id, name: 'Patient Lookup Service' },
     ])
     .returning();
 
@@ -56,9 +60,9 @@ async function main() {
   const [tplV1] = await db
     .insert(templates)
     .values({
-      name: 'Housing Stability Assessment',
+      name: 'Application Security Baseline',
       description:
-        'Screens household housing stability across four domains: living situation, income, social support, and risk.',
+        'Baseline application-security screening across authentication, data protection, supply-chain, and monitoring domains. Based loosely on OWASP ASVS controls.',
       status: 'published',
       version: 1,
     })
@@ -66,12 +70,12 @@ async function main() {
 
   const sections = [
     {
-      title: 'Living situation',
+      title: 'Authentication & access',
       weight: 1.5,
       order: 0,
       questions: [
         {
-          prompt: 'Do you currently have stable housing?',
+          prompt: 'Is multi-factor authentication enforced for all privileged accounts?',
           type: 'true_false' as const,
           required: true,
           weight: 1.0,
@@ -82,28 +86,86 @@ async function main() {
           ],
         },
         {
-          prompt: 'If no, how long have you been without stable housing?',
+          prompt: 'If MFA is not yet enforced, what is the planned timeline?',
           type: 'multiple_choice' as const,
           required: false,
           weight: 1.0,
           order: 1,
           options: [
-            { label: 'Less than 1 month', score: 7, order: 0 },
-            { label: '1-3 months', score: 5, order: 1 },
-            { label: '3-6 months', score: 3, order: 2 },
-            { label: 'More than 6 months', score: 0, order: 3 },
+            { label: 'Rolling out within 30 days', score: 7, order: 0 },
+            { label: 'Planned within 90 days', score: 5, order: 1 },
+            { label: 'Planned this year', score: 3, order: 2 },
+            { label: 'Not on the roadmap', score: 0, order: 3 },
           ],
           conditionalOn: { qIdx: 0, optIdx: 1 }, // show only when Q0 answered "No"
+        },
+        {
+          prompt: 'How are sessions terminated on logout?',
+          type: 'multiple_choice' as const,
+          required: true,
+          weight: 1.0,
+          order: 2,
+          options: [
+            { label: 'Server-side token invalidated and cookie cleared', score: 10, order: 0 },
+            { label: 'Cookie cleared; token remains valid until expiry', score: 4, order: 1 },
+            { label: 'No explicit teardown on the server', score: 0, order: 2 },
+          ],
         },
       ],
     },
     {
-      title: 'Income & employment',
-      weight: 1.0,
+      title: 'Data protection',
+      weight: 1.5,
       order: 1,
       questions: [
         {
-          prompt: 'Are you currently employed?',
+          prompt: 'How are user passwords hashed at rest?',
+          type: 'multiple_choice' as const,
+          required: true,
+          weight: 1.5,
+          order: 0,
+          options: [
+            { label: 'Argon2id or scrypt with tuned parameters', score: 10, order: 0 },
+            { label: 'bcrypt with cost ≥ 12', score: 8, order: 1 },
+            { label: 'PBKDF2 with ≥ 100k iterations', score: 6, order: 2 },
+            { label: 'Another KDF, legacy parameters', score: 3, order: 3 },
+            { label: 'Plaintext, MD5, or unsalted SHA', score: 0, order: 4 },
+          ],
+        },
+        {
+          prompt: 'Is sensitive data (PII, tokens, secrets) encrypted at rest?',
+          type: 'true_false' as const,
+          required: true,
+          weight: 1.0,
+          order: 1,
+          options: [
+            { label: 'Yes', score: 10, order: 0 },
+            { label: 'No', score: 0, order: 1 },
+          ],
+        },
+        {
+          prompt: 'How confident is the team in its data-classification inventory?',
+          type: 'likert' as const,
+          required: true,
+          weight: 1.0,
+          order: 2,
+          options: [
+            { label: 'Very low', score: 1, order: 0 },
+            { label: 'Low', score: 2, order: 1 },
+            { label: 'Moderate', score: 3, order: 2 },
+            { label: 'High', score: 4, order: 3 },
+            { label: 'Very high', score: 5, order: 4 },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Supply chain',
+      weight: 1.0,
+      order: 2,
+      questions: [
+        {
+          prompt: 'Are third-party dependencies scanned for known vulnerabilities on every CI run?',
           type: 'true_false' as const,
           required: true,
           weight: 1.0,
@@ -114,58 +176,48 @@ async function main() {
           ],
         },
         {
-          prompt: 'How confident are you in your current financial situation?',
-          type: 'likert' as const,
-          required: true,
-          weight: 1.5,
-          order: 1,
-          options: [
-            { label: 'Strongly Disagree', score: 1, order: 0 },
-            { label: 'Disagree', score: 2, order: 1 },
-            { label: 'Neutral', score: 3, order: 2 },
-            { label: 'Agree', score: 4, order: 3 },
-            { label: 'Strongly Agree', score: 5, order: 4 },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Social support',
-      weight: 0.75,
-      order: 2,
-      questions: [
-        {
-          prompt: 'How strongly do you agree: "I have people I can turn to for help"?',
-          type: 'likert' as const,
+          prompt: 'How often are production container images rebuilt from their base image?',
+          type: 'multiple_choice' as const,
           required: true,
           weight: 1.0,
-          order: 0,
+          order: 1,
           options: [
-            { label: 'Strongly Disagree', score: 1, order: 0 },
-            { label: 'Disagree', score: 2, order: 1 },
-            { label: 'Neutral', score: 3, order: 2 },
-            { label: 'Agree', score: 4, order: 3 },
-            { label: 'Strongly Agree', score: 5, order: 4 },
+            { label: 'On every merge to main', score: 10, order: 0 },
+            { label: 'Nightly', score: 8, order: 1 },
+            { label: 'Weekly', score: 5, order: 2 },
+            { label: 'Monthly or longer', score: 2, order: 3 },
           ],
         },
       ],
     },
     {
-      title: 'Risk factors',
+      title: 'Monitoring & incident response',
       weight: 1.25,
       order: 3,
       questions: [
         {
-          prompt: 'Have you experienced any of the following in the past 12 months?',
-          type: 'multiple_choice' as const,
-          required: false,
+          prompt: 'How confident is the team in its incident-response playbook for a production compromise?',
+          type: 'likert' as const,
+          required: true,
           weight: 1.0,
           order: 0,
           options: [
-            { label: 'None of the below', score: 10, order: 0 },
-            { label: 'Eviction notice', score: 3, order: 1 },
-            { label: 'Utility shut-off', score: 5, order: 2 },
-            { label: 'Medical emergency', score: 4, order: 3 },
+            { label: 'Very low', score: 1, order: 0 },
+            { label: 'Low', score: 2, order: 1 },
+            { label: 'Moderate', score: 3, order: 2 },
+            { label: 'High', score: 4, order: 3 },
+            { label: 'Very high', score: 5, order: 4 },
+          ],
+        },
+        {
+          prompt: 'Is there a documented on-call rotation for security incidents?',
+          type: 'true_false' as const,
+          required: true,
+          weight: 1.0,
+          order: 1,
+          options: [
+            { label: 'Yes', score: 10, order: 0 },
+            { label: 'No', score: 0, order: 1 },
           ],
         },
       ],
@@ -232,58 +284,58 @@ async function main() {
 
   // Scoring bands
   await db.insert(scoringBands).values([
-    { templateId: tplV1.id, label: 'High risk', minScore: 0, maxScore: 40, color: '#dc2626' },
-    { templateId: tplV1.id, label: 'Moderate risk', minScore: 40.01, maxScore: 70, color: '#d97706' },
-    { templateId: tplV1.id, label: 'Low risk', minScore: 70.01, maxScore: 100, color: '#16a34a' },
+    { templateId: tplV1.id, label: 'Critical risk', minScore: 0, maxScore: 40, color: '#b42318' },
+    { templateId: tplV1.id, label: 'Needs attention', minScore: 40.01, maxScore: 70, color: '#b45309' },
+    { templateId: tplV1.id, label: 'Strong posture', minScore: 70.01, maxScore: 100, color: '#0e7a4f' },
   ]);
 
-  // Template v2 — forked and published
+  // Template v2 — forked and published (tightened bands, trimmed summary shape)
   const [tplV2] = await db
     .insert(templates)
     .values({
-      name: 'Housing Stability Assessment',
-      description: 'v2: recalibrated scoring bands and added "past-year risk" weighting.',
+      name: 'Application Security Baseline',
+      description: 'v2: tightened scoring bands and added explicit supply-chain weighting.',
       status: 'published',
       version: 2,
       parentTemplateId: tplV1.id,
     })
     .returning();
 
-  // Just give v2 one quick section/question so it's usable for a screening
   const [v2Section] = await db
     .insert(templateSections)
-    .values({ templateId: tplV2.id, title: 'Summary', order: 0, weight: 1 })
+    .values({ templateId: tplV2.id, title: 'Executive summary', order: 0, weight: 1 })
     .returning();
   const [v2Q] = await db
     .insert(templateQuestions)
     .values({
       sectionId: v2Section.id,
-      prompt: 'Overall, how stable is your housing situation today?',
+      prompt: 'Overall, how would you rate this application\u2019s security posture today?',
       type: 'likert',
       required: true,
       weight: 1,
       order: 0,
     })
     .returning();
+  const v2LikertLabels = ['Very weak', 'Weak', 'Adequate', 'Strong', 'Very strong'];
   for (let i = 1; i <= 5; i++) {
     await db.insert(templateAnswerOptions).values({
       questionId: v2Q.id,
-      label: `Level ${i}`,
+      label: v2LikertLabels[i - 1],
       score: i,
       order: i - 1,
     });
   }
   await db.insert(scoringBands).values([
-    { templateId: tplV2.id, label: 'At risk', minScore: 0, maxScore: 50, color: '#dc2626' },
-    { templateId: tplV2.id, label: 'Stable', minScore: 50.01, maxScore: 100, color: '#16a34a' },
+    { templateId: tplV2.id, label: 'At risk', minScore: 0, maxScore: 50, color: '#b42318' },
+    { templateId: tplV2.id, label: 'Acceptable', minScore: 50.01, maxScore: 100, color: '#0e7a4f' },
   ]);
 
-  // Archived v0-ish template
+  // Archived template — kept to showcase the archived lifecycle state.
   await db
     .insert(templates)
     .values({
-      name: 'Legacy intake (deprecated)',
-      description: 'Kept as an example of the archived status.',
+      name: 'Legacy perimeter checklist (deprecated)',
+      description: 'Retired in favor of the current application-security baseline.',
       status: 'archived',
       version: 1,
     })
@@ -371,6 +423,7 @@ async function main() {
     new Date('2026-04-15'),
   ];
 
+  // Checkout Service — mature posture, nearly perfect.
   await makeScreening({
     agencyId: acmeAgency.id,
     clientId: clientRows[0].id,
@@ -378,13 +431,19 @@ async function main() {
     submit: true,
     submittedAt: months[0],
     answers: [
-      { questionIndex: [0, 0], optionIndex: 0 }, // stable: Yes -> 10
-      { questionIndex: [1, 0], optionIndex: 0 }, // employed: Yes -> 10
-      { questionIndex: [1, 1], likert: 5 },
-      { questionIndex: [2, 0], likert: 5 },
-      { questionIndex: [3, 0], optionIndex: 0 }, // None of the below
+      { questionIndex: [0, 0], optionIndex: 0 }, // MFA: Yes
+      { questionIndex: [0, 2], optionIndex: 0 }, // Session termination: Server-side invalidated
+      { questionIndex: [1, 0], optionIndex: 0 }, // Password hashing: Argon2id
+      { questionIndex: [1, 1], optionIndex: 0 }, // Encryption at rest: Yes
+      { questionIndex: [1, 2], likert: 5 },       // Data classification confidence: Very high
+      { questionIndex: [2, 0], optionIndex: 0 }, // Dep scanning: Yes
+      { questionIndex: [2, 1], optionIndex: 0 }, // Image rebuild: Every merge
+      { questionIndex: [3, 0], likert: 5 },       // IR playbook confidence: Very high
+      { questionIndex: [3, 1], optionIndex: 0 }, // On-call rotation: Yes
     ],
   });
+
+  // Admin Portal — legacy-shaped; many critical gaps.
   await makeScreening({
     agencyId: acmeAgency.id,
     clientId: clientRows[1].id,
@@ -392,14 +451,20 @@ async function main() {
     submit: true,
     submittedAt: months[1],
     answers: [
-      { questionIndex: [0, 0], optionIndex: 1 }, // stable: No
-      { questionIndex: [0, 1], optionIndex: 2 }, // 3-6 months (now visible)
-      { questionIndex: [1, 0], optionIndex: 1 },
-      { questionIndex: [1, 1], likert: 2 },
-      { questionIndex: [2, 0], likert: 2 },
-      { questionIndex: [3, 0], optionIndex: 1 },
+      { questionIndex: [0, 0], optionIndex: 1 }, // MFA: No
+      { questionIndex: [0, 1], optionIndex: 3 }, // Timeline: Not on the roadmap (now visible)
+      { questionIndex: [0, 2], optionIndex: 2 }, // Session termination: None
+      { questionIndex: [1, 0], optionIndex: 4 }, // Hashing: Plaintext/MD5
+      { questionIndex: [1, 1], optionIndex: 1 }, // Encryption at rest: No
+      { questionIndex: [1, 2], likert: 1 },       // Classification confidence: Very low
+      { questionIndex: [2, 0], optionIndex: 1 }, // Dep scanning: No
+      { questionIndex: [2, 1], optionIndex: 3 }, // Image rebuild: Monthly or longer
+      { questionIndex: [3, 0], likert: 1 },       // IR playbook: Very low
+      { questionIndex: [3, 1], optionIndex: 1 }, // On-call rotation: No
     ],
   });
+
+  // Billing API — mid-band; mostly solid with a few soft spots.
   await makeScreening({
     agencyId: acmeAgency.id,
     clientId: clientRows[2].id,
@@ -407,13 +472,19 @@ async function main() {
     submit: true,
     submittedAt: months[2],
     answers: [
-      { questionIndex: [0, 0], optionIndex: 0 },
-      { questionIndex: [1, 0], optionIndex: 0 },
-      { questionIndex: [1, 1], likert: 4 },
-      { questionIndex: [2, 0], likert: 4 },
-      { questionIndex: [3, 0], optionIndex: 2 },
+      { questionIndex: [0, 0], optionIndex: 0 }, // MFA: Yes
+      { questionIndex: [0, 2], optionIndex: 1 }, // Session termination: Cookie cleared only
+      { questionIndex: [1, 0], optionIndex: 1 }, // Hashing: bcrypt
+      { questionIndex: [1, 1], optionIndex: 0 }, // Encryption: Yes
+      { questionIndex: [1, 2], likert: 4 },       // Classification: High
+      { questionIndex: [2, 0], optionIndex: 0 }, // Dep scanning: Yes
+      { questionIndex: [2, 1], optionIndex: 1 }, // Image rebuild: Nightly
+      { questionIndex: [3, 0], likert: 4 },       // IR playbook: High
+      { questionIndex: [3, 1], optionIndex: 0 }, // On-call: Yes
     ],
   });
+
+  // Mobile Gateway — legacy; critical everywhere.
   await makeScreening({
     agencyId: northwindAgency.id,
     clientId: clientRows[3].id,
@@ -421,14 +492,20 @@ async function main() {
     submit: true,
     submittedAt: months[3],
     answers: [
-      { questionIndex: [0, 0], optionIndex: 1 },
-      { questionIndex: [0, 1], optionIndex: 3 }, // >6 months
-      { questionIndex: [1, 0], optionIndex: 1 },
-      { questionIndex: [1, 1], likert: 1 },
-      { questionIndex: [2, 0], likert: 1 },
-      { questionIndex: [3, 0], optionIndex: 3 },
+      { questionIndex: [0, 0], optionIndex: 1 }, // MFA: No
+      { questionIndex: [0, 1], optionIndex: 2 }, // Timeline: Planned this year
+      { questionIndex: [0, 2], optionIndex: 2 }, // Session: No teardown
+      { questionIndex: [1, 0], optionIndex: 4 }, // Hashing: Plaintext
+      { questionIndex: [1, 1], optionIndex: 1 }, // Encryption: No
+      { questionIndex: [1, 2], likert: 1 },       // Classification: Very low
+      { questionIndex: [2, 0], optionIndex: 1 }, // Dep scanning: No
+      { questionIndex: [2, 1], optionIndex: 3 }, // Image rebuild: Monthly or longer
+      { questionIndex: [3, 0], likert: 1 },       // IR playbook: Very low
+      { questionIndex: [3, 1], optionIndex: 1 }, // On-call: No
     ],
   });
+
+  // Data Export Job — needs attention but workable.
   await makeScreening({
     agencyId: northwindAgency.id,
     clientId: clientRows[4].id,
@@ -436,21 +513,26 @@ async function main() {
     submit: true,
     submittedAt: months[4],
     answers: [
-      { questionIndex: [0, 0], optionIndex: 0 },
-      { questionIndex: [1, 0], optionIndex: 0 },
-      { questionIndex: [1, 1], likert: 3 },
-      { questionIndex: [2, 0], likert: 3 },
-      { questionIndex: [3, 0], optionIndex: 0 },
+      { questionIndex: [0, 0], optionIndex: 0 }, // MFA: Yes
+      { questionIndex: [0, 2], optionIndex: 0 }, // Session: Server-side invalidated
+      { questionIndex: [1, 0], optionIndex: 2 }, // Hashing: PBKDF2
+      { questionIndex: [1, 1], optionIndex: 0 }, // Encryption: Yes
+      { questionIndex: [1, 2], likert: 3 },       // Classification: Moderate
+      { questionIndex: [2, 0], optionIndex: 0 }, // Dep scanning: Yes
+      { questionIndex: [2, 1], optionIndex: 2 }, // Image rebuild: Weekly
+      { questionIndex: [3, 0], likert: 3 },       // IR playbook: Moderate
+      { questionIndex: [3, 1], optionIndex: 0 }, // On-call: Yes
     ],
   });
-  // One in-progress draft so the ledger shows multiple statuses on first load.
+
+  // One in-progress draft (Checkout Service revisit) so the ledger shows mixed statuses on first load.
   await makeScreening({
     agencyId: acmeAgency.id,
     clientId: clientRows[0].id,
     payload: v1Payload,
     submit: false,
     answers: [
-      { questionIndex: [0, 0], optionIndex: 0 }, // just one answer so far
+      { questionIndex: [0, 0], optionIndex: 0 }, // MFA: Yes — just the first answer so far
     ],
   });
 

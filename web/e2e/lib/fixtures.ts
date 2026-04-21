@@ -113,17 +113,17 @@ export const fx = {
  */
 export async function createTestTemplate(nameSuffix = Date.now().toString()): Promise<Template> {
   const tpl = await fx.createTemplate({
-    name: `Test Instrument ${nameSuffix}`,
+    name: `Test Template ${nameSuffix}`,
     description: 'Generated for e2e testing.',
     sections: [
       {
-        title: 'Baseline',
+        title: 'Authentication',
         order: 0,
         weight: 1,
         questions: [
           {
             id: 'q_tf',
-            prompt: 'Are you in stable housing?',
+            prompt: 'Is MFA enforced for privileged accounts?',
             type: 'true_false',
             required: true,
             weight: 1,
@@ -135,15 +135,15 @@ export async function createTestTemplate(nameSuffix = Date.now().toString()): Pr
           },
           {
             id: 'q_cond',
-            prompt: 'How long without stable housing?',
+            prompt: 'When is MFA planned to be enforced?',
             type: 'multiple_choice',
             required: false,
             weight: 1,
             order: 1,
             options: [
-              { label: '< 1 month', score: 7, order: 0 },
-              { label: '1-3 months', score: 5, order: 1 },
-              { label: '> 3 months', score: 0, order: 2 },
+              { label: 'Within 30 days', score: 7, order: 0 },
+              { label: 'Within 90 days', score: 5, order: 1 },
+              { label: 'Not planned', score: 0, order: 2 },
             ],
             // Conditional: only shown if q_tf answered "No"
             conditionals: [
@@ -157,12 +157,12 @@ export async function createTestTemplate(nameSuffix = Date.now().toString()): Pr
         ],
       },
       {
-        title: 'Confidence',
+        title: 'Response readiness',
         order: 1,
         weight: 1,
         questions: [
           {
-            prompt: 'How confident are you in your finances?',
+            prompt: 'How confident is the team in its incident-response playbook?',
             type: 'likert',
             required: true,
             weight: 1,

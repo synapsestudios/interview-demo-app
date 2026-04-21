@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 async function newCasefile(suffix = `${Date.now()}`) {
-  const acme = await fx.getAgencyByName('Acme Health');
+  const acme = await fx.getAgencyByName('Acme Security Partners');
   const client = await fx.createClient(acme.id, `Submit Client ${suffix}`);
   const tpl = await createTestTemplate(`submit-${suffix}`);
   const screening = await fx.createScreening(acme.id, client.id, tpl.id);
