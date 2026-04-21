@@ -70,6 +70,55 @@ export type Template = TemplateListItem & {
   bands: Band[];
 };
 
+/**
+ * Payload shape accepted by POST /templates and PATCH /templates/:id.
+ *
+ * Notes:
+ * - `PATCH` does a FULL REPLACE of sections/bands when those keys are provided.
+ *   Omit a key to leave that branch untouched.
+ * - `id` fields on nested entities are treated as opaque temp-keys that the
+ *   API uses to resolve conditional references within the payload. Any unique
+ *   string works; existing UUIDs are fine to pass through.
+ */
+export type TemplateMutationPayload = {
+  name?: string;
+  description?: string | null;
+  sections?: Array<{
+    id?: string;
+    title: string;
+    order: number;
+    weight?: number;
+    questions: Array<{
+      id?: string;
+      prompt: string;
+      type: 'true_false' | 'multiple_choice' | 'likert';
+      required?: boolean;
+      weight?: number;
+      order: number;
+      options: Array<{
+        id?: string;
+        label: string;
+        score: number;
+        order: number;
+      }>;
+      conditionals?: Array<{
+        dependsOnQuestionId: string;
+        dependsOnAnswerOptionId?: string | null;
+        dependsOnNumericMin?: number | null;
+        dependsOnNumericMax?: number | null;
+        visible?: boolean;
+      }>;
+    }>;
+  }>;
+  bands?: Array<{
+    id?: string;
+    label: string;
+    minScore: number;
+    maxScore: number;
+    color?: string;
+  }>;
+};
+
 export type ScreeningListItem = {
   id: string;
   agencyId: string;
@@ -146,6 +195,16 @@ export const api = {
 
   listTemplates: () => req<TemplateListItem[]>('/templates'),
   getTemplate: (id: string) => req<Template>(`/templates/${id}`),
+  createTemplate: (payload: TemplateMutationPayload) =>
+    req<Template>('/templates', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  updateTemplate: (id: string, payload: TemplateMutationPayload) =>
+    req<Template>(`/templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
   publishTemplate: (id: string) =>
     req<Template>(`/templates/${id}/publish`, { method: 'POST' }),
   archiveTemplate: (id: string) =>

@@ -4,6 +4,7 @@ import { Shell, Mode } from './components/Shell';
 import { api, Agency } from './api';
 import { AdminTemplates } from './pages/AdminTemplates';
 import { AdminTemplateDetail } from './pages/AdminTemplateDetail';
+import { AdminTemplateEdit } from './pages/AdminTemplateEdit';
 import { AgencyScreenings } from './pages/AgencyScreenings';
 import { AgencyScreeningDetail } from './pages/AgencyScreeningDetail';
 import { AgencyDashboard } from './pages/AgencyDashboard';
@@ -56,6 +57,7 @@ export default function App() {
         />
         <Route path="/admin/templates" element={<AdminTemplates />} />
         <Route path="/admin/templates/:id" element={<AdminTemplateDetail />} />
+        <Route path="/admin/templates/:id/edit" element={<AdminTemplateEdit />} />
         <Route path="/agency/screenings" element={<AgencyScreenings agencyId={agencyId} />} />
         <Route path="/agency/screenings/:id" element={<AgencyScreeningDetail />} />
         <Route path="/agency/dashboard" element={<AgencyDashboard agencyId={agencyId} />} />

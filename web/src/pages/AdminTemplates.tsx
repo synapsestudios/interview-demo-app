@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { api, TemplateListItem } from '../api';
 import { useAsync } from '../hooks/useAsync';
 import { StatusBadge } from '../components/Badge';
@@ -14,6 +15,18 @@ function fmtDate(s: string) {
 
 export function AdminTemplates() {
   const { data, loading, reload } = useAsync(() => api.listTemplates(), []);
+  const navigate = useNavigate();
+  const [creating, setCreating] = useState(false);
+
+  const onCreate = async () => {
+    setCreating(true);
+    try {
+      const t = await api.createTemplate({ name: 'Untitled instrument' });
+      navigate(`/admin/templates/${t.id}/edit`);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   if (loading) return <div className="loading">Gathering instruments…</div>;
   if (!data) return <div className="empty">No templates available.</div>;
@@ -46,6 +59,11 @@ export function AdminTemplates() {
         title="Screening instruments"
         dek="Reusable assessment templates. Publish to release to the field; fork to propose a revision without affecting in-flight casefiles."
         note={`${data.length} instruments on file`}
+        actions={
+          <button className="btn" onClick={onCreate} disabled={creating}>
+            {creating ? 'Creating…' : '+ New instrument'}
+          </button>
+        }
       />
 
       <div className="paper">
@@ -114,9 +132,14 @@ function TemplateRow({
       <td className="date">{fmtDate(t.updatedAt)}</td>
       <td className="toolbar-end" onClick={(e) => e.stopPropagation()}>
         {t.status === 'draft' && (
-          <button className="btn ghost" onClick={() => onPublish(t.id)}>
-            Publish
-          </button>
+          <>
+            <Link to={`/admin/templates/${t.id}/edit`} className="btn quiet">
+              Edit
+            </Link>
+            <button className="btn ghost" onClick={() => onPublish(t.id)}>
+              Publish
+            </button>
+          </>
         )}
         {t.status === 'published' && (
           <button className="btn quiet" onClick={() => onFork(t.id)}>

@@ -32,7 +32,16 @@ export function AdminTemplateDetail() {
         title={t.name}
         dek={t.description ?? undefined}
         note={`v${t.version} · ${t.sections.length} sections · ${totalQuestions} questions · ${totalConds} conditional${totalConds === 1 ? '' : 's'}`}
-        actions={<StatusBadge status={t.status} />}
+        actions={
+          <>
+            <StatusBadge status={t.status} />
+            {t.status === 'draft' && (
+              <Link to={`/admin/templates/${t.id}/edit`} className="btn">
+                Edit
+              </Link>
+            )}
+          </>
+        }
       />
 
       {t.status !== 'draft' && (
